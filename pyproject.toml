@@ -1,0 +1,42 @@
+# Workspace root. Dev tooling and shared tool config only — nothing here is installable
+# and this is deliberately NOT a uv workspace: projects within a topic have conflicting
+# dependency sets by design, and one may need to stay installable without another's heavy
+# dependencies. A uv workspace would resolve them all into a single environment, so each
+# project is synced on its own.
+#
+#   uv sync                                     # this root: ruff + pytest only
+#   uv sync --directory topics/<topic>/projects/<project>
+
+[project]
+name = "learning-machine-learning"
+version = "0.0.0"
+description = "Machine learning algorithms explained and implemented, for learning; dev tooling root."
+requires-python = ">=3.12"
+license = "Apache-2.0"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "ruff==0.6.9",
+    "pytest==8.3.3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "topics"]
+markers = [
+    # Contract tests for the modules left as the exercise. Expected to FAIL until the
+    # corresponding module is written — that is the progress indicator, so they are
+    # neither skipped nor --ignore'd. CI runs them in a separate non-blocking job.
+    "exercise: contract for an unimplemented [EXERCISE] module (expected to fail initially)",
+    "slow: hits the network or downloads a model",
+]

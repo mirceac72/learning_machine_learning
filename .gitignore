@@ -1,0 +1,19 @@
+# Secrets
+.env
+
+# Run artifacts, caches and raw data — never committed; the repository holds code only
+**/runs/
+**/.cache/
+**/data/raw/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
