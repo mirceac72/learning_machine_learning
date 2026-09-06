@@ -2,7 +2,7 @@
 
 **Topic:** linear regression.
 
-Ridge regression is least-squares regression with a penalty on the size of the coefficient vector. For every $\lambda > 0$ its estimator exists and is unique, whatever the features, and it is less sensitive than least squares to correlated features, to more features than observations, and to noise in the response. Understanding the derivation establishes what the penalty does to each direction of the feature space, why the estimator must be applied to centred and scaled features, how $\lambda$ is chosen from the data, and where the method cannot help.
+Regression algorithms construct an approximation of a function $f:\mathbb{R}^p \to \mathbb{R}$ from a set of observed pairs (features, response). Linear regression assumes that the function is a linear combination of the $p$ features plus a constant, and estimates its parameters by minimising the sum of squared approximation errors, for which reason it is also called least-squares regression. Ridge regression is least-squares regression with a penalty on the size of the coefficient vector, whose strength is set by a hyperparameter $\lambda > 0$. For every such $\lambda$ the estimator exists and is unique, even with more features than observations, and it is less sensitive than least squares to correlated features and to noise in the response. The derivation shows what the penalty does to each direction of the feature space, why the estimator must be applied to centred and scaled features, how $\lambda$ is chosen from the data, and where the method cannot help.
 
 **Lesson plan.**
 
