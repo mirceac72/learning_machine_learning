@@ -19,9 +19,11 @@ Regression algorithms construct an approximation of a function $f:\mathbb{R}^p \
 
 ## Preliminaries
 
-**Vectors and matrices.** Vectors are columns of real numbers. For $v \in \mathbb{R}^p$, $\|v\|^2 = v^\top v = \sum_j v_j^2$ is the squared Euclidean norm. For matrices, $(AB)^\top = B^\top A^\top$, and a matrix $M$ is *symmetric* when $M^\top = M$. $I$ denotes the identity matrix and $\mathbf{1}$ the vector of ones; their sizes follow from context. The *trace* $\mathrm{tr}(M) = \sum_i M_{ii}$ satisfies $\mathrm{tr}(AB) = \mathrm{tr}(BA)$ whenever both products are defined. A square matrix $Q$ is *orthogonal* when $Q^\top Q = Q Q^\top = I$; multiplication by $Q$ preserves norms, since $\|Qv\|^2 = v^\top Q^\top Q v = \|v\|^2$.
+This section collects the results from linear algebra, calculus and probability that the lesson uses.
 
-**Gradients of linear and quadratic functions.** For a function $f : \mathbb{R}^p \to \mathbb{R}$, the *gradient* $\nabla f(\beta) \in \mathbb{R}^p$ is the vector of partial derivatives, with $k$-th entry $\partial f/\partial\beta_k$. Two cases are needed.
+**Vectors and matrices.** Vectors are columns of real numbers. In regression, the features of one observation form a vector, and the feature vectors of $n$ observations, stacked as rows, form an $n \times p$ matrix. For $v \in \mathbb{R}^p$, $\|v\|^2 = v^\top v = \sum_j v_j^2$ is the squared Euclidean norm. For matrices, $(AB)^\top = B^\top A^\top$, and a matrix $M$ is *symmetric* when $M^\top = M$. $I$ denotes the identity matrix and $\mathbf{1}$ the vector of ones; their sizes follow from context. The *trace* $\mathrm{tr}(M) = \sum_i M_{ii}$ satisfies $\mathrm{tr}(AB) = \mathrm{tr}(BA)$ whenever both products are defined. A square matrix $Q$ is *orthogonal* when $Q^\top Q = Q Q^\top = I$; multiplication by $Q$ preserves norms, since $\|Qv\|^2 = v^\top Q^\top Q v = \|v\|^2$.
+
+**Gradients of linear and quadratic functions.** For a function $f : \mathbb{R}^p \to \mathbb{R}$, the *gradient* $\nabla f(\beta) \in \mathbb{R}^p$ is the vector of partial derivatives, with $k$-th entry $\partial f/\partial\beta_k$. At a point, the gradient is the direction in which the function increases fastest, and it is zero at a minimum. The first fact drives iterative minimisation, the second gives minimisers in closed form. The ridge objective is built from linear and quadratic functions of $\beta$.
 
 *Linear.* Let $f(\beta) = a^\top\beta = \sum_j a_j\beta_j$ for a fixed $a \in \mathbb{R}^p$. Only the term $a_k\beta_k$ depends on $\beta_k$, so $\partial f/\partial\beta_k = a_k$ and
 
@@ -35,23 +37,23 @@ and collecting the $p$ entries into a vector,
 
 $$\nabla f(\beta) = 2M\beta$$
 
-*The two objectives of the lesson.* For fixed $y \in \mathbb{R}^n$ and $X \in \mathbb{R}^{n \times p}$, expanding the square gives
+*The two parts of the objective function.* Ridge regression finds the parameters that minimise an objective function with two aims: to keep the fitted values close to the observed values while penalising large parameter vectors. For fixed $y \in \mathbb{R}^n$ and $X \in \mathbb{R}^{n \times p}$, where $n$ is the number of observations and $p$ the number of features, expanding the square gives
 
 $$\|y - X\beta\|^2 = (y - X\beta)^\top(y - X\beta) = y^\top y - 2\,(X^\top y)^\top\beta + \beta^\top(X^\top X)\beta$$
 
-a constant, a linear function with $a = X^\top y$, and a quadratic with the symmetric matrix $M = X^\top X$. Applying the two rules term by term,
+As a function of $\beta$, the right-hand side is a constant, a linear function with $a = X^\top y$, and a quadratic with the symmetric matrix $M = X^\top X$. Applying the two rules term by term,
 
 $$\nabla_\beta \|y - X\beta\|^2 = -2X^\top y + 2X^\top X\beta = -2X^\top(y - X\beta)$$
 
-The penalty $\|\beta\|^2 = \beta^\top I\beta$ is the quadratic case with $M = I$, so $\nabla_\beta\|\beta\|^2 = 2\beta$.
+The penalty on the parameter vector $\|\beta\|^2 = \beta^\top I\beta$ is the quadratic case with $M = I$, so $\nabla_\beta\|\beta\|^2 = 2\beta$.
 
-**Positive definite matrices.** A symmetric $M$ is *positive semidefinite* (PSD) when $v^\top M v \ge 0$ for every $v$, and *positive definite* (PD) when $v^\top M v > 0$ for every $v \neq 0$. A PD matrix is invertible: $Mv = 0$ would give $v^\top M v = 0$, so $v = 0$. For any matrix $X$, $X^\top X$ is PSD because $v^\top X^\top X v = \|Xv\|^2 \ge 0$, and it is PD exactly when $Xv = 0$ has no nonzero solution, that is, when the columns of $X$ are linearly independent.
+**Positive definite matrices.** A symmetric matrix $M$ is *positive semidefinite* (PSD) when $v^\top M v \ge 0$ for every $v$, and *positive definite* (PD) when $v^\top M v > 0$ for every $v \neq 0$. A PD matrix is invertible: $Mv = 0$ would give $v^\top M v = 0$, so $v = 0$. For any matrix $X$, $X^\top X$ is PSD because $v^\top X^\top X v = \|Xv\|^2 \ge 0$, and it is PD exactly when $Xv = 0$ has no nonzero solution, that is, when the columns of $X$ are linearly independent.
 
 **Minimising a quadratic.** Let $f(\beta) = c - 2b^\top \beta + \beta^\top M \beta$ with $M$ symmetric PSD. Expanding directly, for any $\beta$ and $h$,
 
 $$f(\beta + h) = f(\beta) + h^\top(2M\beta - 2b) + h^\top M h = f(\beta) + h^\top \nabla f(\beta) + h^\top M h$$
 
-If $\nabla f(\beta) = 0$ then $f(\beta + h) - f(\beta) = h^\top M h \ge 0$ for every $h$, so a stationary point is a global minimiser; if $M$ is PD the difference is strictly positive for $h \neq 0$, so the minimiser is unique. Every objective below has this form.
+If $\nabla f(\beta) = 0$ then $f(\beta + h) - f(\beta) = h^\top M h \ge 0$ for every $h$, so a stationary point is a global minimiser; if $M$ is PD the difference is strictly positive for $h \neq 0$, so the minimiser is unique. All objective functions involved in ridge regression have this form.
 
 **Random vectors.** For a random vector $\varepsilon \in \mathbb{R}^n$, $E[\varepsilon]$ is the vector of expectations and $\mathrm{Cov}(\varepsilon) = E\big[(\varepsilon - E\varepsilon)(\varepsilon - E\varepsilon)^\top\big]$ the matrix of covariances, with $\mathrm{Var}(\varepsilon_i)$ on the diagonal. Expectation is linear, $E[A\varepsilon + c] = A\,E[\varepsilon] + c$ for fixed $A$ and $c$, and covariance transforms as $\mathrm{Cov}(A\varepsilon + c) = A\,\mathrm{Cov}(\varepsilon)\,A^\top$, which follows by substituting the definition. For a random vector $Z$ with mean $\mu$, $E\|Z - a\|^2 = \mathrm{tr}\,\mathrm{Cov}(Z) + \|\mu - a\|^2$ for any fixed $a$: write $Z - a = (Z - \mu) + (\mu - a)$, expand the square, and use that the cross term has expectation zero and $E\|Z - \mu\|^2 = \sum_i \mathrm{Var}(Z_i)$.
 
