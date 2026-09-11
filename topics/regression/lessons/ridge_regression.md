@@ -89,11 +89,11 @@ where $\beta_0 \in \mathbb{R}$ is the intercept, $\beta \in \mathbb{R}^p$ the co
 
 #### 1.2 The intercept
 
-The intercept is treated differently from the coefficients. Adding a constant $c$ to every response should shift every fitted value by $c$ and leave the slopes alone; a penalty that shrinks $\beta_0$ toward zero pulls the fit toward $y = 0$ instead, so the estimate would depend on the arbitrary origin of $y$. Least squares and ridge therefore both minimise an objective of the form
+The intercept is treated differently from the coefficients. Adding a constant $c$ to every response should shift every fitted value by $c$; a penalty that shrinks $\beta_0$ toward zero pulls the fitted value at $x = 0$ toward $y = 0$. In order not to favour a fitted value of $0$ at $x = 0$, ridge minimises an objective of the form
 
 $$\Vert y - \beta_0\mathbf{1} - X\beta\Vert^2 + P(\beta)$$
 
-with a penalty $P$ that does not involve $\beta_0$ ($P = 0$ for least squares). Differentiating with respect to $\beta_0$ and setting to zero gives $\mathbf{1}^\top(y - \beta_0\mathbf{1} - X\beta) = 0$, that is,
+with a penalty $P$ that does not involve $\beta_0$. The optimal $\beta_0$ follows by differentiating with respect to $\beta_0$ and setting to zero: $\mathbf{1}^\top(y - \beta_0\mathbf{1} - X\beta) = 0$, that is,
 
 $$\hat\beta_0 = \bar{y} - \bar{x}^\top \beta$$
 
@@ -101,7 +101,7 @@ where $\bar{y}$ is the mean response and $\bar{x} \in \mathbb{R}^p$ the vector o
 
 $$\Vert y_c - X_c\beta\Vert^2 + P(\beta)$$
 
-with $y_c$ and $X_c$ the centred response and features. The procedure is therefore: centre $y$ and every column of $X$; minimise over $\beta$ alone; recover $\hat\beta_0 = \bar{y} - \bar{x}^\top\hat\beta$. Every formula in Part I is written for centred $X$ and $y$ with the intercept omitted. For prediction at a new point $x$, $\hat{y} = \hat\beta_0 + x^\top\hat\beta = \bar{y} + (x - \bar{x})^\top\hat\beta$, with $\bar{x}$ and $\bar{y}$ the training means.
+with $y_c$ and $X_c$ the centred response and features, each with mean zero. The procedure is therefore: centre $y$ and every column of $X$; minimise over $\beta$ alone; recover $\hat\beta_0 = \bar{y} - \bar{x}^\top\hat\beta$. For prediction at a new point $x$, $\hat{y} = \hat\beta_0 + x^\top\hat\beta = \bar{y} + (x - \bar{x})^\top\hat\beta$, with $\bar{x}$ and $\bar{y}$ the training means. The rest of Part I assumes centred features and response, with the intercept omitted.
 
 ---
 
@@ -549,7 +549,7 @@ The glmnet objective multiplied by $2n$ is $\Vert y - X\beta\Vert^2 + n\thinspac
 
 - **The truth is sparse.** If only a few of many features matter, ridge shrinks all coefficients and zeroes none (§5.2): the irrelevant features keep small nonzero coefficients that add variance, and the relevant ones are shrunk to pay for it. A penalty on $\sum_j|\beta_j|$ (the lasso) or a combination of the two (the elastic net) is the tool for that case.
 - **Features on different scales.** Without standardisation the penalty is a different multiple of $\lambda$ for each coefficient (§5.1) and the fit depends on the units chosen. The derivations hold for any $X$, but a single $\lambda$ is a single penalty strength only when the columns share a scale.
-- **A penalised intercept.** Shrinking $\beta_0$ makes the fit depend on the origin of $y$ (§1.2). Centre the response, or use software that leaves the intercept free.
+- **A penalised intercept.** Shrinking $\beta_0$ makes the fit depend on the origin of $y$. Centre the response, or use software that leaves the intercept free.
 - **$\lambda$ chosen with the test set, or standardisation computed on all data before splitting.** Both let held-out observations shape the fit; the reported error is then an underestimate whose size is unknown.
 - **$\lambda$ transplanted from another problem or another library.** The scale of $\lambda$ depends on $n$, on the column scales and on the software convention (§6.3, §13.3). Always re-select.
 - **Extrapolation off the principal directions.** Cross-validation selects $\lambda$ for points resembling the training data, where errors in low-variance directions are cheap (§7.4). At points far along such directions those errors are exposed. Neither ridge nor OLS is trustworthy there, but ridge's shrunken coefficients extrapolate less violently.
